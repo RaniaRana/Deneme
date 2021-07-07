@@ -7,13 +7,13 @@ import statistics
 
 
 
-n =[(random.uniform(38.285616,38.492943),random.uniform(27.274223,27.052840)) for i in range(5)]
+n =[(random.uniform(38.285616,38.492943),random.uniform(27.274223,27.052840)) for i in range(9)]
 nsample=n
 n=np.array(n)
 clusternumber=3
 clustersmembers=[[] for i in range( clusternumber)]
-weightedclustercenters=[[[]*2]*len(n)]*clusternumber
-print('clustermembers empty=',clustersmembers)
+weightedclustercenters=[[]*2]*clusternumber
+print('weightedclustercenters=',weightedclustercenters)
 print('n=',n)
 print('n0=',n[0])
 print('n0:=',n[:,0])
@@ -63,17 +63,24 @@ print('first_c0=',first_c[0])
 print('first_c:0=',first_c[:,0])
 print('________________')
 for i in range(len(n)):
-    distances=[distance(n[i],element) for element in first_c]
-    print(n[i])
-    distanceminindexofclusters=np.argmin(distances)
-    print(distanceminindexofclusters)
-    #print(distances,'\n',distanceminindexofclusters,'\n',clustersmembers,'\n',n[i])
-    clustersmembers[distanceminindexofclusters].append((n[i][0],n[i][1]))
-    print(clustersmembers[0])
-    print(clustersmembers[1])
-    print(clustersmembers[2])
-    print('clustersmembers=', clustersmembers)
-    print('???????????')
+    distances = [distance(n[i], element) for element in first_c]
+    distanceminindexofclusters = np.argmin(distances)
+    print('uzunluk=', len(clustersmembers[distanceminindexofclusters]))
+    if len(clustersmembers[distanceminindexofclusters]) < 2:
+        print(distanceminindexofclusters)
+        print(clustersmembers[distanceminindexofclusters])
+        print('==================')
+        #print(distances,'\n',distanceminindexofclusters,'\n',clustersmembers,'\n',n[i])
+        clustersmembers[distanceminindexofclusters].append((n[i][0],n[i][1]))
+        print(clustersmembers[0])
+        print(clustersmembers[1])
+        print(clustersmembers[2])
+        print('???????????')
+    elif len(clustersmembers[distanceminindexofclusters])>=2:
+        for iii in range(len(first_c):
+            first_c[iii]=n[i]
+    else:
+        print('!!!!!!!!!!!!!!!!!!!!')
 
 
     #print(clustersmembers)
@@ -81,13 +88,15 @@ for i in range(len(n)):
 print('clustersmembers=',clustersmembers)
 print('clustersmembers[0]=',clustersmembers[0])
 print('pull column=',dividetox2d(clustersmembers[0]))
-print(clustersmembers[2])
 print('*************')
 print(len(clustersmembers[0][0]))
 plt.plot(n[:,0],n[:,1],'r.')
 plt.plot(center[:,0],center[:,1],'bv')
 plt.plot(first_c[:,0],first_c[:,1],'b.')
 plt.show()
+
+
+
 
 
 
