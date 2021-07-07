@@ -1,0 +1,94 @@
+import random
+import time
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+import statistics
+
+
+
+n =[(random.uniform(38.285616,38.492943),random.uniform(27.274223,27.052840)) for i in range(5)]
+nsample=n
+n=np.array(n)
+clusternumber=3
+clustersmembers=[[] for i in range( clusternumber)]
+weightedclustercenters=[[[]*2]*len(n)]*clusternumber
+print('clustermembers empty=',clustersmembers)
+print('n=',n)
+print('n0=',n[0])
+print('n0:=',n[:,0])
+print('n:1=',n[:,1])
+center=[(38.340241 , 27.128692)]
+center=np.array(center)
+print('center=',center[0])
+print('_________________')
+
+
+
+def distance(xn1,xn2):
+    xn2=np.array(xn2)
+    xn1=np.array(xn1)
+    distxn12=np.sqrt(np.sum((xn2-xn1)**2))
+    return float(distxn12)
+def randomfirstclusterchoices(numberofcluster):
+    if numberofcluster<=len(nsample):
+        randomfirstcenters=[]
+        rands=random.sample(nsample,numberofcluster)
+        randomfirstcenters.append(rands)
+        randomfirstcenters=np.array(randomfirstcenters)
+        print('first random centers=',randomfirstcenters[0])
+        return randomfirstcenters[0]
+    else:
+        print('Unnecessery number of busses')
+def dividetox2d(arr):
+    x1=[]
+    for i in range(len(arr)):
+        x1.append(arr[i][0])
+    return x1
+def dividetoy2d(arr):
+    y1=[]
+    for i in range(len(arr)):
+        y1.append(arr[i][1])
+    return y1
+
+def dividetoxy2d(arr):
+    y=dividetoy2d(arr)
+    x=dividetox2d(arr)
+    return x,y
+
+
+first_c=randomfirstclusterchoices(clusternumber)
+print('first_c=',first_c)
+print('first_c0=',first_c[0])
+print('first_c:0=',first_c[:,0])
+print('________________')
+for i in range(len(n)):
+    distances=[distance(n[i],element) for element in first_c]
+    print(n[i])
+    distanceminindexofclusters=np.argmin(distances)
+    print(distanceminindexofclusters)
+    #print(distances,'\n',distanceminindexofclusters,'\n',clustersmembers,'\n',n[i])
+    clustersmembers[distanceminindexofclusters].append((n[i][0],n[i][1]))
+    print(clustersmembers[0])
+    print(clustersmembers[1])
+    print(clustersmembers[2])
+    print('clustersmembers=', clustersmembers)
+    print('???????????')
+
+
+    #print(clustersmembers)
+
+print('clustersmembers=',clustersmembers)
+print('clustersmembers[0]=',clustersmembers[0])
+print('pull column=',dividetox2d(clustersmembers[0]))
+print(clustersmembers[2])
+print('*************')
+print(len(clustersmembers[0][0]))
+plt.plot(n[:,0],n[:,1],'r.')
+plt.plot(center[:,0],center[:,1],'bv')
+plt.plot(first_c[:,0],first_c[:,1],'b.')
+plt.show()
+
+
+
+
