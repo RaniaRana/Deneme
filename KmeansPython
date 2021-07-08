@@ -1,22 +1,24 @@
 import random
 import time
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
 import math
 import statistics
 
 
 
-n =[(random.uniform(38.285616,38.492943),random.uniform(27.274223,27.052840)) for i in range(9)]
+n =[(random.uniform(38.285616,38.492943),random.uniform(27.274223,27.052840)) for i in range(300)]
 nsample=n
 n=np.array(n)
 clusternumber=3
+buscapacity=100
 clustersmembers=[[] for i in range( clusternumber)]
 weightedclustercenters=[[]*2]*clusternumber
 print('weightedclustercenters=',weightedclustercenters)
 print('n=',n)
 print('n0=',n[0])
-print('n0:=',n[:,0])
+print('n:,0=',n[:,0])
 print('n:1=',n[:,1])
 center=[(38.340241 , 27.128692)]
 center=np.array(center)
@@ -36,14 +38,16 @@ def randomfirstclusterchoices(numberofcluster):
         rands=random.sample(nsample,numberofcluster)
         randomfirstcenters.append(rands)
         randomfirstcenters=np.array(randomfirstcenters)
-        print('first random centers=',randomfirstcenters[0])
         return randomfirstcenters[0]
-    else:
-        print('Unnecessery number of busses')
 def dividetox2d(arr):
     x1=[]
     for i in range(len(arr)):
         x1.append(arr[i][0])
+    return x1
+def dividetox1d(arr):
+    x1=[]
+    for i in range(len(arr)):
+        x1.append(arr[i])
     return x1
 def dividetoy2d(arr):
     y1=[]
@@ -56,44 +60,117 @@ def dividetoxy2d(arr):
     x=dividetox2d(arr)
     return x,y
 
+plt.ion() ## Note this correction
+
+plt.figure(0)
+
+
 
 first_c=randomfirstclusterchoices(clusternumber)
+a1=first_c[:, 0]
+b1=first_c[:, 1]
+#plt.plot(a1,b1 , 'bo')
+
+
 print('first_c=',first_c)
 print('first_c0=',first_c[0])
 print('first_c:0=',first_c[:,0])
 print('________________')
-for i in range(len(n)):
-    distances = [distance(n[i], element) for element in first_c]
-    distanceminindexofclusters = np.argmin(distances)
-    print('uzunluk=', len(clustersmembers[distanceminindexofclusters]))
-    if len(clustersmembers[distanceminindexofclusters]) < 2:
-        print(distanceminindexofclusters)
-        print(clustersmembers[distanceminindexofclusters])
-        print('==================')
-        #print(distances,'\n',distanceminindexofclusters,'\n',clustersmembers,'\n',n[i])
-        clustersmembers[distanceminindexofclusters].append((n[i][0],n[i][1]))
-        print(clustersmembers[0])
-        print(clustersmembers[1])
-        print(clustersmembers[2])
-        print('???????????')
-    elif len(clustersmembers[distanceminindexofclusters])>=2:
-        for iii in range(len(first_c):
-            first_c[iii]=n[i]
-    else:
-        print('!!!!!!!!!!!!!!!!!!!!')
+
+for ips in range(200):
+    controlvariable = 0
+    xsumofoldmembers = 0
+    ysumofoldmembers = 0
+    clustersmembers = [[] for i in range(clusternumber)]
+    for i in range(len(n)):
+        distances = [distance(n[i], element) for element in first_c]
+        sorteddistances=sorted(distances)
+        distanceminindexofclusters = np.argmin(distances)
+        controlvariable+=1
+        if len(clustersmembers[distanceminindexofclusters]) < buscapacity:
+            clustersmembers[distanceminindexofclusters].append((n[i][0], n[i][1]))
+            if len(clustersmembers[distanceminindexofclusters])>=2 :
+                for ii in range(len(clustersmembers[distanceminindexofclusters])):
+                    xsumofoldmembers+=clustersmembers[distanceminindexofclusters][ii][0]
+                    ysumofoldmembers+=clustersmembers[distanceminindexofclusters][ii][1]
+                tempa=float(xsumofoldmembers)
+                tempb=float(len(clustersmembers[distanceminindexofclusters]))
+                tempc = float(ysumofoldmembers)
+                first_c[distanceminindexofclusters] = (tempa/tempb,tempc/tempb)
+                plt.cla()
+                plt.plot(n[:, 0], n[:, 1], 'r.')
+                plt.plot(center[:, 0], center[:, 1], 'bv')
+                ax = first_c[:, 0]
+                bx = first_c[:, 1]
+                plt.plot(dividetox2d(clustersmembers[0]), dividetoy2d(clustersmembers[0]), 'sy')
+                plt.plot(dividetox2d(clustersmembers[1]), dividetoy2d(clustersmembers[1]), 'sr')
+                plt.plot(dividetox2d(clustersmembers[2]), dividetoy2d(clustersmembers[2]), 'sg')
+                plt.plot(first_c[0, 0], first_c[0, 1], 'bo')
+                plt.plot(first_c[1, 0], first_c[1, 1], 'mo')
+                plt.plot(first_c[2, 0], first_c[2, 1], 'ko')
+                plt.pause(0.00003)
+            xsumofoldmembers = 0
+            ysumofoldmembers = 0
+        else:
+            cont=0              #while looptaki indexleme için
+            whileresults=0              #hata sinyali için
+            while len(clustersmembers[distanceminindexofclusters])>=buscapacity: #seçili küme dolu ise loopta kümeler bitene kadar loopta tutar. dolu değil ise sonlanır.ve sonraki işlemde atama yapılabilir
+                if cont+1<len(sorteddistances): #sıradaki küme mevcut ise sıradaki en yakın kümeyi seçmeyi sağlar
+                    cont+=1
+                    distanceminindexofclusters = distances.index(sorteddistances[cont]) #sıradaki en yakın kümeyi distances içinden indexiyle seçer. distances indexi kaçıncı kümeye atandığını kontrol ediyor
+                else:       #bütün kümeler bitmiş ve atama yapılamamışsa devreye girer
+                    whileresults=2              #hata sinyalidir
+                    break
+            if whileresults==2:
+                quit()
+            else:
+                if len(clustersmembers[distanceminindexofclusters]) < buscapacity:
+                    clustersmembers[distanceminindexofclusters].append((n[i][0], n[i][1]))
+                if len(clustersmembers[distanceminindexofclusters]) >= 2:
+                    for ii in range(len(clustersmembers[distanceminindexofclusters])):
+                        xsumofoldmembers += clustersmembers[distanceminindexofclusters][ii][0]
+                        ysumofoldmembers += clustersmembers[distanceminindexofclusters][ii][1]
+                    tempa = float(xsumofoldmembers)
+                    tempb = float(len(clustersmembers[distanceminindexofclusters]))
+                    tempc = float(ysumofoldmembers)
+                    first_c[distanceminindexofclusters] = (tempa / tempb, tempc / tempb)
+                    plt.cla()
+                    plt.plot(n[:, 0], n[:, 1], 'r.')
+                    plt.plot(center[:, 0], center[:, 1], 'bv')
+                    ax = first_c[:, 0]
+                    bx = first_c[:, 1]
+                    plt.plot(dividetox2d(clustersmembers[0]), dividetoy2d(clustersmembers[0]), 'sy')
+                    plt.plot(dividetox2d(clustersmembers[1]), dividetoy2d(clustersmembers[1]), 'sr')
+                    plt.plot(dividetox2d(clustersmembers[2]), dividetoy2d(clustersmembers[2]), 'sg')
+                    plt.plot(first_c[0, 0], first_c[0, 1], 'bo')
+                    plt.plot(first_c[1, 0], first_c[1, 1], 'mo')
+                    plt.plot(first_c[2, 0], first_c[2, 1], 'ko')
+                    plt.pause(0.00003)
+                xsumofoldmembers = 0
+                ysumofoldmembers = 0
+
+plt.ioff()
+plt.show()
 
 
-    #print(clustersmembers)
+
+
+#print(clustersmembers)
 
 print('clustersmembers=',clustersmembers)
-print('clustersmembers[0]=',clustersmembers[0])
+print('clustersmembers[0]=',dividetox2d(clustersmembers[0]))
 print('pull column=',dividetox2d(clustersmembers[0]))
 print('*************')
-print(len(clustersmembers[0][0]))
-plt.plot(n[:,0],n[:,1],'r.')
-plt.plot(center[:,0],center[:,1],'bv')
-plt.plot(first_c[:,0],first_c[:,1],'b.')
-plt.show()
+
+
+
+
+
+
+
+
+
+
 
 
 
